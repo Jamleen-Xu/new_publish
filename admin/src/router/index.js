@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory, useRoute } from 'vue-router'
 import routes from './config'
 import { userGetterRouter } from '@/stores/getterRouter'
+import { userStore } from '@/stores/user'
 
 const router = createRouter({
   history: createWebHistory(),
@@ -21,12 +22,16 @@ const router = createRouter({
 // 每次路由转跳之前
 router.beforeEach((to, from, next) => {
   if (to.path === '/login') {
-    next()
+    if (localStorage.getItem('token') && userStore().userInfo.username) {
+      next({path: '/home'})
+    } else {
+      next()
+    }
   } else {
     // 如果不是去login页面的，进行两个判断
     // 如果已经登录过了， next
     // 如果未登录，跳转到login
-    if (!localStorage.getItem('token')) {
+    if (!localStorage.getItem('token') || !userStore().userInfo.username) {
       next('/login')
     } else {
       // 登陆过了，判断是否有权限

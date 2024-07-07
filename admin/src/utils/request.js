@@ -1,5 +1,4 @@
 import axios from "axios";
-import { ElMessage } from "element-plus";
 
 
 let service = axios.create({
@@ -8,13 +7,24 @@ let service = axios.create({
 })
 
 service.interceptors.request.use((config) => {
+    // 每次请求添加token
+    const token = localStorage.getItem('token')
+    config.headers.Authorization = `Jamleen ${token}`
     return config
+}, (error) => {
+    return Promise.reject(error)
 })
 
 service.interceptors.response.use((response) => {
-    return response.data
+    const { authorization } = response.headers
+    authorization && localStorage.setItem("token", authorization)
+    return response
 }, (error) => {
-    ElMessage({ type: 'error', message: '请求发生错误' })
+    const { status } = error.response;
+    if (status === 401) {
+        localStorage.removeItem("token")
+        window.location.href = '#/login'
+    }
     return Promise.reject(error)
 })
 

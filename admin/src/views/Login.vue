@@ -23,8 +23,11 @@
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router';
 import { userLogin } from '@/api/user';
+import { ElMessage } from 'element-plus';
+import { userStore } from '@/stores/user';
 
 const $router = useRouter()
+const store = userStore()
 
 // 输入的表单信息
 const loginForm = ref({
@@ -55,10 +58,13 @@ const login = async () => {
         // console.log(valid)  // 布尔值
         if (valid) {
             // 发送请求
-            // localStorage.setItem('token', 'aaaa')
-            // $router.push('/home')
-            let result = await userLogin(loginForm.value)
-            console.log(result)
+            const result = await userLogin(loginForm.value)
+            if (result.data.AcctionType === 'ok') {
+                store.changeUserInfo(result.data.data)
+                $router.push('/home')
+            } else {
+                ElMessage({type: 'error', message: '用户名或密码错误'})   
+            }
         }
     })
 

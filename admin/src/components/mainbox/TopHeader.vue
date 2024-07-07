@@ -7,7 +7,7 @@
             <span style="margin-left:10px;">新闻发布管理系统</span>
         </div>
         <div class="right">
-            <span>欢迎您,admin</span>
+            <span>欢迎 {{ store.userInfo.username }} 回来</span>
             <el-dropdown>
                 <span class="el-dropdown-link">
                     <el-icon :size="30" color="white" class="el-icon--right">
@@ -29,14 +29,15 @@
 import { Menu, User } from '@element-plus/icons-vue'
 import { useRouter } from 'vue-router';
 import { useCollapsed } from '@/stores/collapsed'
+import { userStore } from '@/stores/user';
 
 const $router = useRouter()
 
-
+const store = userStore()
 const collapsed = useCollapsed()
 
 const Logout = () => {
-    localStorage.removeItem('token')
+    store.changeUserInfo()
     $router.push('/login')
 }
 </script>
